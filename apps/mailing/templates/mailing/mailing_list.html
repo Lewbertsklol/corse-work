@@ -1,0 +1,15 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+    <h1>Рассылки</h1>
+
+    <ul>
+        {% for object in object_list %}
+            <li>
+                <a href="{% url 'mailing:mailing_detail' object.pk %}">{{ object.name }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+    <a href="{% url 'mailing:mailing_create' %}">Добавить</a>
+
+{% endblock content %}
