@@ -15,5 +15,10 @@ class MailingForm(forms.Form):
     time = forms.TimeField(initial=datetime.now().time(), required=True)
 
     # Требуется переопределние полей под конкретных юзеров
-    message = forms.ModelChoiceField(Message.objects.all(), required=True)
-    clients = forms.ModelMultipleChoiceField(Client.objects.all(), required=True)
+    message = forms.ModelChoiceField(Message.objects.none(), required=True)
+    clients = forms.ModelMultipleChoiceField(Client.objects.none(), required=True)
+
+    def __init__(self, user, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['message'].queryset = Message.objects.filter(user=user)
+        self.fields['clients'].queryset = Client.objects.filter(user=user)

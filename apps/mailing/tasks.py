@@ -8,7 +8,7 @@ from apps.clients.models import Client
 
 
 @shared_task(name='send_email')
-def send_email(*, user_id, message_id, clients_id):
+def send_email(*, user_id: int, message_id: int, clients_id: list):
     message = Message.objects.get(id=message_id)
     user = get_user_model().objects.get(id=user_id)
     return send_mail(

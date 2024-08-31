@@ -33,7 +33,9 @@ class Mailing(AbstractModel):
 
     @property
     def name(self):
-        return self.sending_task.name
+        '''Имя рассылки в django_celery_beat должно быть уникальным. 
+        Поэтому при создании в начале имени рассылки добавляем имя пользователя + ::'''
+        return self.sending_task.name.split('::')[1]
 
     name.fget.short_description = _("Название")
 
@@ -54,9 +56,6 @@ class Mailing(AbstractModel):
         return self.sending_task.start_time
 
     start_time.fget.short_description = _("Первый запуск")
-    
-    
-
 
     def __str__(self):
         return self.name
