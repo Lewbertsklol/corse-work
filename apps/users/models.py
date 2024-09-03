@@ -42,3 +42,7 @@ class User(AbstractUser):
     class Meta:
         verbose_name = _("Пользователь")
         verbose_name_plural = _("Пользователи")
+        permissions = [
+            ("can_ban_users", _("Можно банить Пользователя")),
+            ("can_unban_users", _("Можно разбанить Пользователя")),
+        ]

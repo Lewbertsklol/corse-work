@@ -1,29 +1,29 @@
 import json
-from datetime import datetime
 
-from django.views import generic
-from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
+from django.http import HttpRequest
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
+from django.views import generic
+
 from django_celery_beat.models import PeriodicTask
 
-from apps.clients.models import Client
-from apps.mailing.models import Mailing, Message
+from apps.mailing.models import Mailing
 from apps.mailing.forms import MailingForm
-# Create your views here.
+from apps.main.permissions import OwnerPermissionMixin
 
 
-class MailingListView(generic.ListView):
+class MailingListView(LoginRequiredMixin, generic.ListView):
     model = Mailing
+    login_url = reverse_lazy('users:login')
 
     def get_queryset(self):
         return Mailing.objects.filter(user=self.request.user)
 
 
-class MailingDetailView(generic.DetailView):
-    model = Mailing
-
-
-class MailingCreateView(generic.View):
+class MailingCreateView(LoginRequiredMixin, generic.View):
+    login_url = reverse_lazy('users:login')
 
     def get(self, request):
         return render(request, 'mailing/mailing_form.html', {'form': MailingForm(request.user)})
@@ -32,13 +32,13 @@ class MailingCreateView(generic.View):
         form = MailingForm(request.user, request.POST)
         if form.is_valid():
             task = PeriodicTask.objects.create(
+                # добавляем email пользователя к имени таски, чтобы не было конфликтов по имени у разных пользователей
                 name=request.user.email + '::' + form.cleaned_data['name'],
                 interval=form.cleaned_data['interval'],
                 task='send_email',
-                start_time=datetime.combine(form.cleaned_data['date'], form.cleaned_data['time']),
+                start_time=form.cleaned_data['datetime'],
                 enabled=form.cleaned_data['enabled'],
                 kwargs=json.dumps({
-                    'user_id': request.user.id,
                     'message_id': form.cleaned_data['message'].id,
                     'clients_id': list(form.cleaned_data['clients'].values_list('id', flat=True))
                 }),
@@ -53,15 +53,18 @@ class MailingCreateView(generic.View):
         return render(request, 'mailing/mailing_form.html', {'form': form})
 
 
-class MailingUpdateView(generic.View):
+class MailingUpdateView(LoginRequiredMixin, OwnerPermissionMixin, generic.View):
+    login_url = reverse_lazy('users:login')
+
+    def get_object(self):
+        return Mailing.objects.get(id=self.kwargs['pk'])
 
     def get(self, request, pk):
-        mailing = Mailing.objects.get(id=pk)
+        mailing = self.get_object()
         form = MailingForm(request.user, data={
             'name': mailing.name,
             'interval': mailing.interval,
-            'date': mailing.start_time.date(),
-            'time': mailing.start_time.time(),
+            'datetime': mailing.start_time,
             'enabled': mailing.is_active,
             'message': mailing.message,
             'clients': mailing.clients.all()
@@ -77,10 +80,9 @@ class MailingUpdateView(generic.View):
                 name=request.user.email + '::' + form.cleaned_data['name'],
                 interval=form.cleaned_data['interval'],
                 task='mailing.tasks.send_email',
-                start_time=datetime.combine(form.cleaned_data['date'], form.cleaned_data['time']),
+                start_time=form.cleaned_data['datetime'],
                 enabled=form.cleaned_data['enabled'],
                 kwargs=json.dumps({
-                    'user_id': request.user.id,
                     'message_id': form.cleaned_data['message'].id,
                     'clients_id': list(form.cleaned_data['clients'].values_list('id', flat=True))
                 }),
@@ -96,6 +98,24 @@ class MailingUpdateView(generic.View):
         return render(request, 'mailing/mailing_form.html', {'form': form})
 
 
-class MailingDeleteView(generic.DeleteView):
+class MailingDeleteView(LoginRequiredMixin, OwnerPermissionMixin, generic.DeleteView):
     model = Mailing
     success_url = reverse_lazy('mailing:mailing_list')
+    login_url = reverse_lazy('users:login')
+
+
+@login_required(login_url=reverse_lazy('users:login'))
+def toggle_mailing(request: HttpRequest, pk):
+    mailing = Mailing.objects.get(id=pk)
+    mailing.sending_task.enabled = not mailing.sending_task.enabled
+    mailing.sending_task.save()
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+class ManagerMailingListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    model = Mailing
+    permission_required = 'mailing.view_mailing'
+    login_url = reverse_lazy('users:login')
+
+    def get_queryset(self):
+        return Mailing.objects.filter(user__id=self.kwargs['pk'])

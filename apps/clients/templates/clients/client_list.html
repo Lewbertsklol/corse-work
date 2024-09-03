@@ -1,15 +1,21 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-    <h1>Список клиентов</h1>
 
-    <ul>
-        {% for client in object_list %}
-            <li>
-                <a href="{% url 'clients:clients_detail' client.pk %}">{{ client.name }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'clients:clients_create' %}">Добавить</a>
+    <h1 class="m-4">Список клиентов</h1>
+
+    {% for client in object_list %}
+        <!-- В text="{{ client.comment }}_" специально пропущен один пустой символ, для пустого значения  -->
+        <c-card type="Клиент" title={{ client.name }} subtitle={{ client.email }} text="{{ client.comment }} ">
+            <a class="btn btn-info"
+               href="{% url 'clients:clients_update' client.id %}">Редактировать</a>
+            <form action="{% url 'clients:clients_delete' client.id %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Удалить">
+            </form>
+        </c-card>
+    {% endfor %}
+
+    <a class="btn btn-primary" href="{% url 'clients:clients_create' %}">Добавить</a>
 
 {% endblock content %}

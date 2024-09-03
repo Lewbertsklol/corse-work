@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.contrib.auth.decorators import login_required, permission_required
 from django.contrib.auth.hashers import make_password
 from django.core.mail import send_mail
 from django.http import HttpRequest
@@ -6,6 +7,7 @@ from django.shortcuts import redirect
 from django.urls import reverse, reverse_lazy
 from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
 from django.views import generic
+from django.contrib.auth.mixins import PermissionRequiredMixin, LoginRequiredMixin
 
 import random
 from string import ascii_letters, digits
@@ -13,15 +15,18 @@ from string import ascii_letters, digits
 from .forms import ResetPasswordForm, UserCreationForm
 
 
-class UserListView(generic.ListView):
+class UserListView(LoginRequiredMixin, PermissionRequiredMixin, generic.ListView):
+    permission_required = 'users.view_user'
     model = get_user_model()
 
 
+@login_required
+@permission_required(('users.ban_users', 'users.unban_users'))
 def toggle_active(request, pk):
     user = get_user_model().objects.get(pk=pk)
     user.is_active = not user.is_active
     user.save()
-    return redirect('users:list')
+    return redirect('users:users_list')
 
 
 class RegisterView(generic.CreateView):

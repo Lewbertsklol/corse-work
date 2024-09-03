@@ -1,15 +1,20 @@
 {% extends 'main/base.html' %}
 
 {% block content %}
-    <h1>Сообщения</h1>
 
-    <ul>
-        {% for object in object_list %}
-            <li>
-                <a href="{% url 'mailing:messages_detail' object.pk %}">{{ object.title }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'mailing:messages_create' %}">Добавить</a>
+    <h1 class="m-4">Сообщения для рассылки</h1>
+
+    {% for message in object_list %}
+        <c-card type="Сообщение" title={{ message.title }} text={{ message.body }}>
+            <a class="btn btn-info"
+               href="{% url 'mailing:messages_update' message.id %}">Редактировать</a>
+            <form action="{% url 'mailing:messages_delete' message.id %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Удалить">
+            </form>
+        </c-card>
+    {% endfor %}
+
+    <a class="btn btn-primary" href="{% url 'mailing:messages_create' %}">Добавить</a>
 
 {% endblock content %}

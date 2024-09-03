@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
 
+    # Frontend
+    'django_cotton',
+    'widget_tweaks',
+
     # default
     'django.contrib.admin',
     'django.contrib.auth',
@@ -99,6 +103,15 @@ DATABASES = {
     }
 }
 
+CACHE_ENABLED = os.environ.get('CACHE_ENABLED') == 'True'
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.redis.RedisCache",
+            "LOCATION": os.environ.get('LOCATION'),
+        }
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -136,12 +149,23 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / "static",
+]
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Users
 AUTH_USER_MODEL = 'users.User'
+LOGIN_REDIRECT_URL = 'clients:clients_list'
+LOGOUT_REDIRECT_URL = 'users:login'
 
 # Celery
 CELERY_BROKER_URL = 'redis://localhost:6379/0'

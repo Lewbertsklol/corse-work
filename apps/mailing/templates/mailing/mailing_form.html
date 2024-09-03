@@ -1,11 +1,45 @@
 {% extends 'main/base.html' %}
+{% load widget_tweaks %}
 
 {% block content %}
 
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
 
-        <input type="submit" value="Сохранить">
+        {% csrf_token %}
+
+        <label for="form.name.id_for_label" class="form-label">Название</label>
+        {% render_field form.name class="form-control" %}
+
+        <br />
+
+        <label for="form.interval.id_for_label" class="form-label">Интервал</label>
+        {% render_field form.interval class="form-select" %}
+
+        <br />
+
+        <label for="form.datetime.id_for_label" class="form-label">Дата начала рассылки</label>
+        {% render_field form.datetime type="datetime-local" class="form-control" %}
+
+        <br />
+
+        <label for="form.enabled.id_for_label" class="form-label">Активна:</label>
+        {% render_field form.enabled class="form-check-inline" %}
+
+        <br />
+
+        <label for="form.message.id_for_label" class="form-label">Сообщение</label>
+        {% render_field form.message class="form-select" %}
+
+        <br />
+
+        <label for="form.clients.id_for_label" class="form-label">Клиенты</label>
+        {% render_field form.clients class="form-select" %}
+        <div class="form-text">Чтобы выбрать несколько или снять выделение, зажмите Ctrl на Windows или Command на Mac</div>
+
+        <br />
+
+        <input class="btn btn-primary" type="submit" value="Сохранить">
+
     </form>
+
 {% endblock content %}

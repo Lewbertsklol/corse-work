@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% block content %}
+
+    <div class="row align-items-end">
+
+        <div class="col-4 text-center">
+            <h1>Всего рассылок:</h1>
+            <h1>{{ mailings_total }}</h1>
+        </div>
+        <div class="col-4 text-center">
+            <h1>Активных рассылок:</h1>
+            <h1>{{ active_mailings }}</h1>
+        </div>
+        <div class="col-4 text-center">
+            <h1>Уникальных клиентов:</h1>
+            <h1>{{ unique_clients }}</h1>
+        </div>
+
+    </div>
+
+    <div class="row">
+        {% for post in posts %}
+            <c-card type="Статья" title={{ post.title }} subtitle="Количество просмотров: {{ post.views_count }}. Дата публикации: {{ post.created_at }}." text={{ post.text }}>
+            </c-card>
+        {% endfor %}
+    </div>
+{% endblock content %}

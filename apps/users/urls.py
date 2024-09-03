@@ -12,5 +12,7 @@ urlpatterns = [
     path('email-verification/<email>/', views.email_verification, name='email-verification'),
     path('reset-password/', views.ResetPasswordView.as_view(), name='reset-password'),
 
+    # manager's api
     path('list/', views.UserListView.as_view(), name='users_list'),
+    path('toggle_active/<int:pk>/', views.toggle_active, name='toggle_active'),
 ]

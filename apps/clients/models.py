@@ -7,8 +7,8 @@ from apps.main.models import AbstractModel
 
 class Client(AbstractModel):
     name = models.CharField(max_length=255, verbose_name=_("ФИО"))
-    email = models.EmailField(unique=True, verbose_name=_("Email"))
-    comment = models.TextField(verbose_name=_("Комментарий"))
+    email = models.EmailField(verbose_name=_("Email"))
+    comment = models.TextField(verbose_name=_("Комментарий"), blank=True, null=True)
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

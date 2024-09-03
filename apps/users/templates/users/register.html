@@ -1,0 +1,29 @@
+{% extends 'main/base.html' %}
+{% load widget_tweaks %}
+
+{% block content %}
+    <h1>Регистрация</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="form.email.id_for_label" class="form-label">Адрес электронной почты</label>
+        {% render_field form.email class="form-control" %}
+        {% for error in form.email.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+
+        <br />
+
+        <label for="form.password1.id_for_label" class="form-label">Пароль</label>
+        {% render_field form.password1 class="form-control" %}
+        {% for error in form.password1.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+
+        <br />
+
+        <label for="form.password1.id_for_label" class="form-label">Повторите пароль</label>
+        {% render_field form.password2 class="form-control" %}
+        {% for error in form.password2.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+
+        <br />
+
+        <button class="btn btn-primary" type="submit">Войти</button>
+    </form>
+{% endblock content %}

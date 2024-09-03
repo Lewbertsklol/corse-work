@@ -1,1 +1,24 @@
+{% extends 'main/base.html' %}
+{% load widget_tweaks %}
 
+{% block content %}
+    <h1>Вход</h1>
+    <form method="post">
+        {% csrf_token %}
+
+        <label for="form.username.id_for_label" class="form-label">Адрес электронной почты</label>
+        {% render_field form.username class="form-control" %}
+        {% for error in form.username.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+
+        <br />
+
+        <label for="form.password.id_for_label" class="form-label">Пароль</label>
+        {% render_field form.password class="form-control" %}
+        {% for error in form.password.errors %}<p class="text-danger">{{ error }}</p>{% endfor %}
+
+        <br />
+
+        <a class="btn btn-secondary" href="{% url 'users:reset-password' %}">Забыли пароль?</a>
+        <input class="btn btn-primary" type="submit" value="Войти">
+    </form>
+{% endblock content %}

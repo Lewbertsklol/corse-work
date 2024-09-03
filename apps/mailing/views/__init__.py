@@ -1,14 +1,18 @@
 from .mailing import (
     MailingListView,
-    MailingDetailView,
     MailingCreateView,
     MailingUpdateView,
     MailingDeleteView,
+    ManagerMailingListView,
+    toggle_mailing
 )
 from .message import (
     MessageListView,
-    MessageDetailView,
     MessageCreateView,
     MessageUpdateView,
     MessageDeleteView,
+)
+from .results import (
+    ResultListView,
+    ResultDeleteView
 )

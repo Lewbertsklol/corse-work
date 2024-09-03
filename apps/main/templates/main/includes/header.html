@@ -1,15 +1,41 @@
-<header>
-    <div>
-        <ul style="margin: auto;">
-            <li>
-                <a href="{% url 'clients:clients_list' %}">Клиенты</a>
-            </li>
-            <li>
-                <a href="{% url 'mailing:mailing_list' %}">Рассылки</a>
-            </li>
-            <li>
-                <a href="{% url 'mailing:messages_list' %}">Сообщения</a>
-            </li>
-        </ul>
+{% load custom_tags %}
+
+<nav class="navbar navbar-expand-lg bg-body-tertiary">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="{% url 'main:index' %}">ESender</a>
+        <button class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup"
+                aria-expanded="false"
+                aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="d-flex w-100 justify-content-between">
+                <div class="navbar-nav gap-3">
+                    <a class="nav-link active" href="{% url 'clients:clients_list' %}">Клиенты</a>
+                    <a class="nav-link active" href="{% url 'mailing:mailing_list' %}">Рассылки</a>
+                    <a class="nav-link active" href="{% url 'mailing:messages_list' %}">Сообщения</a>
+                    {% if request.user|has_group:"manager" or request.user.is_superuser %}
+                        <a href="{% url 'users:users_list' %}" class="nav-link active">Интерфейс менеджера</a>
+                    {% endif %}
+                </div>
+                <div class="mt-2 d-flex gap-2">
+                    {% if request.user.is_authenticated %}
+                        <p>Привет, {{ request.user }}</p>
+                        <form action="{% url 'users:logout' %}" method="post">
+                            {% csrf_token %}
+
+                            <button type="submit" class="btn btn-secondary">Выйти</button>
+                        </form>
+                    {% else %}
+                        <a href="{% url 'users:login' %}" class="btn btn-secondary">Войти</a>
+                        <a href="{% url 'users:register' %}" class="btn btn-primary">Регистрация</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
     </div>
-</header>
+</nav>

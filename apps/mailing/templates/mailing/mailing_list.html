@@ -1,15 +1,40 @@
+<!-- djlint:off -->
 {% extends 'main/base.html' %}
 
 {% block content %}
-    <h1>Рассылки</h1>
 
-    <ul>
-        {% for object in object_list %}
-            <li>
-                <a href="{% url 'mailing:mailing_detail' object.pk %}">{{ object.name }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <a href="{% url 'mailing:mailing_create' %}">Добавить</a>
+    <h1 class="m-4">Рассылки</h1>
+
+    {% for mailing in object_list %}
+        <c-card 
+            type="Рассылка" 
+            title={{ mailing.name }} 
+            subtitle="Начиная с {{ mailing.sending_task.start_time }} - {{ mailing.interval }}" 
+            text="Сообщение <<{{ mailing.message }}>> рассылается: {{ mailing.clients.all|join:", " }}." 
+            border_color="{% if mailing.is_active %}border-success{% else %}border-secondary-subtle{% endif %}"
+        > 
+            {% if mailing.is_active %}
+                <a class="btn btn-secondary"
+                href="{% url 'mailing:mailing_toggle' mailing.id %}">Деактивировать</a>
+            {% else %}
+                <a class="btn btn-success"
+                href="{% url 'mailing:mailing_toggle' mailing.id %}">Активировать</a>
+            {% endif %}
+
+            <a class="btn btn-info"
+            href="{% url 'mailing:results_list' mailing.id %}">Отчёты</a>
+
+            <a class="btn btn-info"
+            href="{% url 'mailing:mailing_update' mailing.id %}">Редактировать</a>
+
+            <form action="{% url 'mailing:mailing_delete' mailing.id %}" method="post">
+                {% csrf_token %}
+                <input class="btn btn-danger" type="submit" value="Удалить">
+            </form>
+
+        </c-card>
+    {% endfor %}
+
+    <a class="btn btn-primary" href="{% url 'mailing:mailing_create' %}">Добавить</a>
 
 {% endblock content %}

@@ -1,0 +1,22 @@
+{% extends 'main/base.html' %}
+{% load custom_tags %}
+
+{% block content %}
+
+    {% if object_list %}
+        <h1 class="m-4">Отчёты по рассылке: {{ object_list.0.periodic_task_name|get_task_name }}</h1>
+
+        {% for result in object_list %}
+            <c-card type="Отчёт" title={{ result.date_done }} subtitle={{ result.status }} text={{ result.result }}>
+                <form action="{% url 'mailing:results_delete' result.id %}" method="post">
+                    {% csrf_token %}
+                    <input class="btn btn-danger" type="submit" value="Удалить">
+                </form>
+            </c-card>
+        {% endfor %}
+
+    {% else %}
+        <h1 class="m-4">Отчётов по рассылке нет</h1>
+    {% endif %}
+
+{% endblock content %}
