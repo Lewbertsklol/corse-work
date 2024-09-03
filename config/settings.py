@@ -176,7 +176,7 @@ CELERY_RESULT_BACKEND = 'django-db'
 CELERY_RESULT_EXTENDED = True
 
 # Email settings
-EMAIL_HOST = 'smtp.yandex.ru'
+EMAIL_HOST = os.environ.get('EMAIL_HOST')
 EMAIL_PORT = 465
 EMAIL_HOST_USER = os.environ.get('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_HOST_PASSWORD')
